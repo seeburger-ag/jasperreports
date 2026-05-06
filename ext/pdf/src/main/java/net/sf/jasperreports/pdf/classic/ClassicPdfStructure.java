@@ -55,32 +55,23 @@ public class ClassicPdfStructure implements PdfStructure
 	}
 
 	@Override
-	public PdfStructureEntry createAllTag(String language)
+	public PdfStructureEntry createDocumentTag(String language)
 	{
 		PdfWriter pdfWriter = pdfProducer.getPdfWriter();
-		PdfStructureTreeRoot root = pdfWriter.getStructureTreeRoot();
+		ClassicPdfStructureTreeRoot.install(pdfWriter);
 		
-		PdfName pdfNameALL = new PdfName("All");
-		root.mapRole(pdfNameALL, PdfName.SECT);
-		root.mapRole(PdfName.IMAGE, PdfName.FIGURE);
+		PdfStructureTreeRoot root = pdfWriter.getStructureTreeRoot();
 		root.mapRole(PdfName.TEXT, PdfName.P);
-		PdfStructureElement allTag = new PdfStructureElement(root, pdfNameALL);
-		if(pdfWriter.getPDFXConformance() == PdfWriter.PDFA1A)
-		{
-			root.mapRole(new PdfName("Anchor"), PdfName.NONSTRUCT);
-			root.mapRole(PdfName.TEXT, PdfName.SPAN);
-		}
-		else
-		{
-			root.mapRole(new PdfName("Anchor"), PdfName.TEXT);
-		}
+		root.mapRole(new PdfName("Anchor"), PdfName.P);
+		
+		PdfStructureElement documentTag = new PdfStructureElement(root, PdfName.DOCUMENT);
 		
 		if (language != null)
 		{
-			allTag.put(PdfName.LANG, new PdfString(language));
+			documentTag.put(PdfName.LANG, new PdfString(language));
 		}
 		
-		return new ClassicStructureEntry(this, allTag);
+		return new ClassicStructureEntry(this, documentTag);
 	}
 	
 	protected PdfName pdfName(String name)
@@ -110,7 +101,17 @@ public class ClassicPdfStructure implements PdfStructure
 	@Override
 	public PdfStructureEntry beginTag(PdfStructureEntry parent, String name)
 	{
-		ClassicStructureEntry tag = createElement(parent, name);
+		ClassicStructureEntry tag = null;
+		
+		if (name == null)
+		{
+			tag = ((ClassicStructureEntry) parent);
+		}
+		else
+		{
+			tag = createElement(parent, name);
+		}
+		
 		pdfProducer.getPdfContentByte().beginMarkedContentSequence(tag.getElement());
 		return tag;
 	}
@@ -121,7 +122,17 @@ public class ClassicPdfStructure implements PdfStructure
 		PdfDictionary markedContentProps = new PdfDictionary();
 		markedContentProps.put(PdfName.ACTUALTEXT, new PdfString(text, PdfObject.TEXT_UNICODE));
 		
-		ClassicStructureEntry tag = createElement(parent, name);
+		ClassicStructureEntry tag = null;
+		
+		if (name == null)
+		{
+			tag = ((ClassicStructureEntry) parent);
+		}
+		else
+		{
+			tag = createElement(parent, name);
+		}
+		
 		pdfProducer.getPdfContentByte().beginMarkedContentSequence(tag.getElement(), 
 				markedContentProps);
 		return tag;
@@ -129,6 +140,32 @@ public class ClassicPdfStructure implements PdfStructure
 
 	@Override
 	public void endTag()
+	{
+		pdfProducer.getPdfContentByte().endMarkedContentSequence();
+	}
+
+	@Override
+	public void beginArtifact()
+	{
+		pdfProducer.getPdfContentByte().beginMarkedContentSequence(new PdfName("Artifact"));
+	}
+
+	@Override
+	public void endArtifact()
+	{
+		pdfProducer.getPdfContentByte().endMarkedContentSequence();
+	}
+
+	@Override
+	public void beginSpan(String actualText)
+	{
+		PdfDictionary markedContentProps = new PdfDictionary();
+		markedContentProps.put(PdfName.ACTUALTEXT, new PdfString(actualText, PdfObject.TEXT_UNICODE));
+		pdfProducer.getPdfContentByte().beginMarkedContentSequence(PdfName.SPAN, markedContentProps, true);
+	}
+
+	@Override
+	public void endSpan()
 	{
 		pdfProducer.getPdfContentByte().endMarkedContentSequence();
 	}

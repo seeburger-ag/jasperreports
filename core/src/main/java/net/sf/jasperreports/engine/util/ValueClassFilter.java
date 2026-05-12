@@ -23,6 +23,8 @@
  */
 package net.sf.jasperreports.engine.util;
 
+import java.util.List;
+
 import net.sf.jasperreports.annotations.properties.Property;
 import net.sf.jasperreports.annotations.properties.PropertyScope;
 import net.sf.jasperreports.engine.JRPropertiesUtil;
@@ -69,7 +71,11 @@ public class ValueClassFilter extends AbstractClassFilter
 	}
 
 	@Override
-	protected void addHardcodedWhitelist(StandardClassWhitelist whitelist)
+	protected void addExtraWhitelists(JasperReportsContext jasperReportsContext,
+			List<ClassWhitelist> whitelists)
 	{
+		List<ValueClassWhitelist> extensionWhitelists = jasperReportsContext.getExtensions(
+				ValueClassWhitelist.class);
+		whitelists.addAll(extensionWhitelists);
 	}
 }

@@ -23,14 +23,9 @@
  */
 package net.sf.jasperreports.engine.util;
 
-import net.sf.jasperreports.engine.JRRuntimeException;
-
 /**
  * @author Lucian Chirita (lucianc@users.sourceforge.net)
  */
-public interface ClassLoaderFilter
+public class StandardValueClassWhitelist extends StandardClassWhitelist implements ValueClassWhitelist
 {
-
-	void checkClassVisibility(String className) throws JRRuntimeException;
-	
 }

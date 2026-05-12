@@ -53,7 +53,7 @@ public class FilteredObjectInputStream extends ObjectInputStream
 	
 	protected final JasperReportsContext jasperReportsContext;
 
-	private DeserializationFilter deserializationFilter;
+	private ClassFilter deserializationFilter;
 
 	/**
 	 * Creates an object input stream that reads data from the specified
@@ -64,7 +64,7 @@ public class FilteredObjectInputStream extends ObjectInputStream
 	 * @see ObjectInputStream#ObjectInputStream(InputStream)
 	 */
 	public FilteredObjectInputStream(JasperReportsContext jasperReportsContext, InputStream in,
-			DeserializationFilter deserializationFilter) throws IOException
+			ClassFilter deserializationFilter) throws IOException
 	{
 		super(wrapInputStream(jasperReportsContext, in));
 		

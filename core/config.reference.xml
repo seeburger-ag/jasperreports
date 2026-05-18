@@ -5945,6 +5945,37 @@ flag needs to be set in order for the whitelist to apply.
   </configProperty>
   
   
+  <!-- 	net.sf.jasperreports.value.deserialization.class.whitelist.{arbitrary_name} -->
+
+  <configProperty name="net.sf.jasperreports.value.deserialization.class.whitelist.{arbitrary_name}">
+    <description>
+Defines a list of classes that are allowed when deserializing values used in reports.
+<br/>
+The property value should be a comma separated list of class names.  Wildcards are supported in class names:
+<ul>
+ <li><code>*</code> stands for any class/package name or part of a class/package name, e.g.
+  <ul>
+   <li><code>com.example.*</code> means any class in the <code>com.example</code> package (but not in subpackages)</li>
+   <li><code>com.example.*Data</code> means any class in the <code>com.example</code> package that ends in <code>Data</code></li>
+  </ul>
+ </li>
+ <li><code>**</code> stands for any fully qualified class name or part of a fully qualified class name, e.g.
+  <ul>
+   <li><code>com.example.**</code> means any class in the <code>com.example</code> package or in a subpackage</li>
+   <li><code>com.example.**Data</code> means any class that ends in <code>Data</code> in the <code>com.example</code> package or in a subpackage</li>
+   <li><code>**</code> means any class</li>
+  </ul>
+ </li>
+</ul>
+<br/>
+The <a href="#net.sf.jasperreports.deserialization.class.filter.enabled">net.sf.jasperreports.deserialization.class.filter.enabled</a>
+flag needs to be set in order for the whitelist to apply.
+<br/>
+By default, no classes are whitelisted for value deserialization.
+    </description>
+  </configProperty>
+
+
   <!-- 	net.sf.jasperreports.deserialization.byte.count.limit -->
   
   <configProperty name="net.sf.jasperreports.deserialization.byte.count.limit">

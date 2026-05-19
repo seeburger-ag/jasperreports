@@ -119,9 +119,9 @@ public class DefaultRepositoryService implements StreamRepositoryService
 			{
 				if (!filesEnabled && JRLoader.isFileSystemURL(url))
 				{
-					if (log.isDebugEnabled())
+					if (log.isWarnEnabled())
 					{
-						log.debug("file system URL " + url + " not enabled");
+						log.warn("file system URL " + url + " not enabled");
 					}
 					return null;
 				}

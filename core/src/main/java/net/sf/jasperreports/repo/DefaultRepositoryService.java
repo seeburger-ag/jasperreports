@@ -117,6 +117,14 @@ public class DefaultRepositoryService implements StreamRepositoryService
 			URL url = JRResourcesUtil.createURL(uri, urlHandlerFactory);
 			if (url != null)
 			{
+				if (!filesEnabled && JRLoader.isFileSystemURL(url))
+				{
+					if (log.isDebugEnabled())
+					{
+						log.debug("file system URL " + url + " not enabled");
+					}
+					return null;
+				}
 				return JRLoader.getInputStream(url);
 			}
 

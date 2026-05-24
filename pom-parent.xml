@@ -190,6 +190,9 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
 				<version>${buildnumber-maven-plugin.version}</version>
+				<configuration>
+					<shortRevisionLength>8</shortRevisionLength>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>

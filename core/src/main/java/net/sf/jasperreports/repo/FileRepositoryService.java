@@ -215,6 +215,14 @@ public class FileRepositoryService implements StreamRepositoryService
 		if (uri != null)
 		{
 			file = new File(getRoot(), uri);
+
+			Path rootPath = rootNormalizedPath();
+			Path filePath = file.toPath().normalize();
+			if (!filePath.startsWith(rootPath))
+			{
+				throw new JRRuntimeException("Requested output path " + uri 
+						+ " falls outside repository root path " + rootPath);
+			}
 		}
 
 		OutputStream os = null;

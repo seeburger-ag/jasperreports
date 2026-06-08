@@ -31,6 +31,7 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperPrintManager;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRRtfExporter;
 import net.sf.jasperreports.engine.export.oasis.JROdsExporter;
@@ -38,6 +39,7 @@ import net.sf.jasperreports.engine.export.oasis.JROdtExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
+import net.sf.jasperreports.engine.type.RotationEnum;
 import net.sf.jasperreports.engine.util.AbstractSampleApp;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.export.SimpleExporterInput;
@@ -88,9 +90,8 @@ public class ImagesApp extends AbstractSampleApp
 	 */
 	public void fill() throws JRException
 	{
-		long start = System.currentTimeMillis();
-		JasperFillManager.fillReportToFile("target/reports/ImagesReport.jasper", null);
-		System.out.println("Report : target/reports/ImagesReport.jasper. Filling time : " + (System.currentTimeMillis() - start));
+		String destFile = JasperFillManager.fillReportToFile("target/reports/ImagesReport.jasper", null);
+		System.out.println(destFile);
 
 		fill("dukesign.jpg", "panoramic");
 		fill("dukewave.png", "upright");
@@ -102,7 +103,19 @@ public class ImagesApp extends AbstractSampleApp
 	 */
 	private void fill(String imageFileName, String folderName) throws JRException
 	{
-		File folder = new File("target/reports/" + folderName);
+		fill(imageFileName, folderName, RotationEnum.NONE);
+		fill(imageFileName, folderName, RotationEnum.LEFT);
+		fill(imageFileName, folderName, RotationEnum.RIGHT);
+		fill(imageFileName, folderName, RotationEnum.UPSIDE_DOWN);
+	}
+	
+	
+	/**
+	 *
+	 */
+	private void fill(String imageFileName, String folderName, RotationEnum rotation) throws JRException
+	{
+		File folder = new File("target/reports/" + folderName + (rotation == RotationEnum.NONE ? "" : ("-" + rotation.getName().toLowerCase())));
 		folder.mkdirs();
 		
 		Map<String, Object> parameters = new HashMap<>();
@@ -112,13 +125,15 @@ public class ImagesApp extends AbstractSampleApp
 		for(int i = 0; i < files.length; i++)
 		{
 			File reportFile = files[i];
-			long start = System.currentTimeMillis();
+			JasperReport jasperReport = (JasperReport)JRLoader.loadObject(reportFile);
+			jasperReport.getStyles()[0].setRotation(rotation);
+			File destFile = new File(folder, reportFile.getName().substring(0, reportFile.getName().length() - ".jasper".length()) + ".jrprint"); 
 			JasperFillManager.fillReportToFile(
-				reportFile.getAbsolutePath(), 
-				new File(folder, reportFile.getName() + ".jrprint").getAbsolutePath(), 
+				jasperReport, 
+				destFile.getAbsolutePath(), 
 				parameters
 				);
-			System.out.println("Report : " + reportFile + ". Filling time : " + (System.currentTimeMillis() - start));
+			System.out.println(destFile);
 		}
 	}
 	
@@ -132,9 +147,8 @@ public class ImagesApp extends AbstractSampleApp
 		for(int i = 0; i < files.length; i++)
 		{
 			File reportFile = files[i];
-			long start = System.currentTimeMillis();
 			JasperPrintManager.printReport(reportFile.getAbsolutePath(), true);
-			System.out.println("Report : " + reportFile + ". Printing time : " + (System.currentTimeMillis() - start));
+			System.out.println(reportFile);
 		}
 	}
 	
@@ -148,9 +162,8 @@ public class ImagesApp extends AbstractSampleApp
 		for(int i = 0; i < files.length; i++)
 		{
 			File reportFile = files[i];
-			long start = System.currentTimeMillis();
-			JasperExportManager.exportReportToPdfFile(reportFile.getAbsolutePath());
-			System.out.println("Report : " + reportFile + ". PDF creation time : " + (System.currentTimeMillis() - start));
+			String destFile = JasperExportManager.exportReportToPdfFile(reportFile.getAbsolutePath());
+			System.out.println(destFile);
 		}
 	}
 	
@@ -164,9 +177,8 @@ public class ImagesApp extends AbstractSampleApp
 		for(int i = 0; i < files.length; i++)
 		{
 			File reportFile = files[i];
-			long start = System.currentTimeMillis();
-			JasperExportManager.exportReportToXmlFile(reportFile.getAbsolutePath(), false);
-			System.out.println("Report : " + reportFile + ". XML creation time : " + (System.currentTimeMillis() - start));
+			String destFile = JasperExportManager.exportReportToXmlFile(reportFile.getAbsolutePath(), false);
+			System.out.println(destFile);
 		}
 	}
 	
@@ -180,9 +192,8 @@ public class ImagesApp extends AbstractSampleApp
 		for(int i = 0; i < files.length; i++)
 		{
 			File reportFile = files[i];
-			long start = System.currentTimeMillis();
-			JasperExportManager.exportReportToXmlFile(reportFile.getAbsolutePath(), true);
-			System.out.println("Report : " + reportFile + ". XML creation time : " + (System.currentTimeMillis() - start));
+			String destFile = JasperExportManager.exportReportToXmlFile(reportFile.getAbsolutePath(), true);
+			System.out.println(destFile);
 		}
 	}
 	
@@ -196,9 +207,8 @@ public class ImagesApp extends AbstractSampleApp
 		for(int i = 0; i < files.length; i++)
 		{
 			File reportFile = files[i];
-			long start = System.currentTimeMillis();
-			JasperExportManager.exportReportToHtmlFile(reportFile.getAbsolutePath());
-			System.out.println("Report : " + reportFile + ". HTML creation time : " + (System.currentTimeMillis() - start));
+			String destFile = JasperExportManager.exportReportToHtmlFile(reportFile.getAbsolutePath());
+			System.out.println(destFile);
 		}
 	}
 	
@@ -211,7 +221,6 @@ public class ImagesApp extends AbstractSampleApp
 		File[] files = getFiles(new File("target/reports"), "jrprint");
 		for(int i = 0; i < files.length; i++)
 		{
-			long start = System.currentTimeMillis();
 			File sourceFile = files[i];
 
 			JasperPrint jasperPrint = (JasperPrint)JRLoader.loadObject(sourceFile);
@@ -225,7 +234,7 @@ public class ImagesApp extends AbstractSampleApp
 
 			exporter.exportReport();
 
-			System.out.println("Report : " + sourceFile + ". RTF creation time : " + (System.currentTimeMillis() - start));
+			System.out.println(destFile);
 		}
 	}
 	
@@ -238,7 +247,6 @@ public class ImagesApp extends AbstractSampleApp
 		File[] files = getFiles(new File("target/reports"), "jrprint");
 		for(int i = 0; i < files.length; i++)
 		{
-			long start = System.currentTimeMillis();
 			File sourceFile = files[i];
 
 			JasperPrint jasperPrint = (JasperPrint)JRLoader.loadObject(sourceFile);
@@ -255,7 +263,7 @@ public class ImagesApp extends AbstractSampleApp
 
 			exporter.exportReport();
 
-			System.out.println("Report : " + sourceFile + ". XLS creation time : " + (System.currentTimeMillis() - start));
+			System.out.println(destFile);
 		}
 	}
 	
@@ -268,7 +276,6 @@ public class ImagesApp extends AbstractSampleApp
 		File[] files = getFiles(new File("target/reports"), "jrprint");
 		for(int i = 0; i < files.length; i++)
 		{
-			long start = System.currentTimeMillis();
 			File sourceFile = files[i];
 
 			JasperPrint jasperPrint = (JasperPrint)JRLoader.loadObject(sourceFile);
@@ -282,7 +289,7 @@ public class ImagesApp extends AbstractSampleApp
 
 			exporter.exportReport();
 
-			System.out.println("Report : " + sourceFile + ". CSV creation time : " + (System.currentTimeMillis() - start));
+			System.out.println(destFile);
 		}
 	}
 	
@@ -295,7 +302,6 @@ public class ImagesApp extends AbstractSampleApp
 		File[] files = getFiles(new File("target/reports"), "jrprint");
 		for(int i = 0; i < files.length; i++)
 		{
-			long start = System.currentTimeMillis();
 			File sourceFile = files[i];
 
 			JasperPrint jasperPrint = (JasperPrint)JRLoader.loadObject(sourceFile);
@@ -309,7 +315,7 @@ public class ImagesApp extends AbstractSampleApp
 
 			exporter.exportReport();
 
-			System.out.println("Report : " + sourceFile + ". ODT creation time : " + (System.currentTimeMillis() - start));
+			System.out.println(destFile);
 		}
 	}
 	
@@ -322,7 +328,6 @@ public class ImagesApp extends AbstractSampleApp
 		File[] files = getFiles(new File("target/reports"), "jrprint");
 		for(int i = 0; i < files.length; i++)
 		{
-			long start = System.currentTimeMillis();
 			File sourceFile = files[i];
 
 			JasperPrint jasperPrint = (JasperPrint)JRLoader.loadObject(sourceFile);
@@ -336,7 +341,7 @@ public class ImagesApp extends AbstractSampleApp
 
 			exporter.exportReport();
 
-			System.out.println("Report : " + sourceFile + ". ODS creation time : " + (System.currentTimeMillis() - start));
+			System.out.println(destFile);
 		}
 	}
 	
@@ -349,7 +354,6 @@ public class ImagesApp extends AbstractSampleApp
 		File[] files = getFiles(new File("target/reports"), "jrprint");
 		for(int i = 0; i < files.length; i++)
 		{
-			long start = System.currentTimeMillis();
 			File sourceFile = files[i];
 
 			JasperPrint jasperPrint = (JasperPrint)JRLoader.loadObject(sourceFile);
@@ -363,7 +367,7 @@ public class ImagesApp extends AbstractSampleApp
 
 			exporter.exportReport();
 
-			System.out.println("Report : " + sourceFile + ". DOCX creation time : " + (System.currentTimeMillis() - start));
+			System.out.println(destFile);
 		}
 	}
 	
@@ -376,7 +380,6 @@ public class ImagesApp extends AbstractSampleApp
 		File[] files = getFiles(new File("target/reports"), "jrprint");
 		for(int i = 0; i < files.length; i++)
 		{
-			long start = System.currentTimeMillis();
 			File sourceFile = files[i];
 
 			JasperPrint jasperPrint = (JasperPrint)JRLoader.loadObject(sourceFile);
@@ -393,7 +396,7 @@ public class ImagesApp extends AbstractSampleApp
 
 			exporter.exportReport();
 
-			System.out.println("Report : " + sourceFile + ". XLSX creation time : " + (System.currentTimeMillis() - start));
+			System.out.println(destFile);
 		}
 	}
 	
@@ -406,7 +409,6 @@ public class ImagesApp extends AbstractSampleApp
 		File[] files = getFiles(new File("target/reports"), "jrprint");
 		for(int i = 0; i < files.length; i++)
 		{
-			long start = System.currentTimeMillis();
 			File sourceFile = files[i];
 
 			JasperPrint jasperPrint = (JasperPrint)JRLoader.loadObject(sourceFile);
@@ -420,7 +422,7 @@ public class ImagesApp extends AbstractSampleApp
 
 			exporter.exportReport();
 
-			System.out.println("Report : " + sourceFile + ". PPTX creation time : " + (System.currentTimeMillis() - start));
+			System.out.println(destFile);
 		}
 	}
 	
